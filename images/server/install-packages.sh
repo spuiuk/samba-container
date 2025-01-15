@@ -141,6 +141,8 @@ case "${package_selection}-${OS_BASE}" in
         support_packages+=(python3-pyyaml python3-tomli python3-rados)
     ;;
 esac
+# Packages which could be skipped if not present
+optional_packages=(libcephfs-proxy2)
 
 # Assign version suffix to samba packages
 samba_versioned_packages=()
@@ -153,6 +155,9 @@ done
     install --setopt=install_weak_deps=False -y \
     "${support_packages[@]}" \
     "${samba_versioned_packages[@]}"
+"${dnf_cmd[@]}" \
+    install --setopt=install_weak_deps=False -y --skip-broken \
+    "${optional_packages[@]}"
 dnf clean all
 
 cp --preserve=all /etc/ctdb/functions /usr/share/ctdb/functions
